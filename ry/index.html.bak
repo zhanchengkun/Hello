@@ -1,0 +1,161 @@
+<html>
+<head>
+ <script type="text/javascript" src="jquery-1.8.2.min.js"></script>
+ <script src="http://cdn.ronghub.com/RongIMLib-2.0.6.beta.min.js"></script>
+<script type="text/javascript">RongIMClient.init("mgb7ka1nbnkrg");
+
+
+var token = "6SUEFL6hDShrn1dFPXXPzb0j+j+Z2HIaIvhV71+SEof53IgWj+IhglqQa/p/r8YYa23lMshomNm3/mU88o1DUA==";
+
+$(function(){ 
+// 连接融云服务器。
+      RongIMClient.connect(token, {
+        onSuccess: function(userId) {
+          console.log("Login successfully." + userId);
+        },
+        onTokenIncorrect: function() {
+          console.log('token无效');
+        },
+        onError:function(errorCode){
+              var info = '';
+              switch (errorCode) {
+                case RongIMLib.ErrorCode.TIMEOUT:
+                  info = '超时';
+                  break;
+                case RongIMLib.ErrorCode.UNKNOWN_ERROR:
+                  info = '未知错误';
+                  break;
+                case RongIMLib.ErrorCode.UNACCEPTABLE_PaROTOCOL_VERSION:
+                  info = '不可接受的协议版本';
+                  break;
+                case RongIMLib.ErrorCode.IDENTIFIER_REJECTED:
+                  info = 'appkey不正确';
+                  break;
+                case RongIMLib.ErrorCode.SERVER_UNAVAILABLE:
+                  info = '服务器不可用';
+                  break;
+              }
+              console.log(errorCode);
+            }
+})
+// 设置连接监听状态 （ status 标识当前连接状态）
+ // 连接状态监听器
+RongIMClient.setConnectionStatusListener({
+    onChanged: function (status) {
+        switch (status) {
+            //链接成功
+            case RongIMLib.ConnectionStatus.CONNECTED:
+                console.log('链接成功2');
+                break;
+            //正在链接
+            case RongIMLib.ConnectionStatus.CONNECTING:
+                console.log('正在链接1');
+                break;
+            //重新链接
+            case RongIMLib.ConnectionStatus.DISCONNECTED:
+                console.log('断开连接');
+                break;
+            //其他设备登陆
+            case RongIMLib.ConnectionStatus.KICKED_OFFLINE_BY_OTHER_CLIENT:
+                console.log('其他设备登陆');
+                break;
+              //网络不可用
+            case RongIMLib.ConnectionStatus.NETWORK_UNAVAILABLE:
+              console.log('网络不可用');
+              break;
+            }
+    }});
+
+ // 消息监听器
+ RongIMClient.setOnReceiveMessageListener({
+    // 接收到的消息
+    onReceived: function (message) { 
+	 
+        // 判断消息类型
+        switch(message.messageType){
+            case RongIMClient.MessageType.TextMessage:
+$("#demo").append(message.content.content+"<br/>")
+                   console.log(message.content.content);
+                //发送的消息内容将会被打印
+                break;
+         
+            default:
+
+                // 自定义消息
+                // do something...
+        }
+    }
+});
+
+//qd46yzrf4700f
+//{"code":200,"userId":"zhan","token":"hlRUnUvWK7dyVr+2v5pNeTlPOxjCzq6NRo9Fc1hQfI1QgZg8T89Ah/a1z66QJcmv8/9RuU71cvDPv6Z8wBeAVg=="}
+ $("#btn1").click(function(){
+		$("#demo").text("");
+	 RongIMClient.getInstance().hasRemoteUnreadMessages(token,{
+    onSuccess:function(hasMessage){
+        if(hasMessage){
+            // 有未读的消息
+			console.info('未读')
+        }else{
+	console.info('无未读')
+
+            // 没有未读的消息
+        }
+    },onError:function(err){
+        // 错误处理...
+    }
+});
+});
+
+
+ $("#btn2").click(function(){
+   RongIMClient.getInstance().getConversationList({
+      onSuccess: function(list) {
+        console.log(list);
+		$("#demo").text("")
+		for(var i=0;i<list.length;i++){
+		$("#demo").append(list[i].latestMessage.senderUserId+":"+list[i].latestMessage.content.content+"<br/>")
+		}
+      },
+      onError: function(error) {
+         // do something...
+      }
+    },null);
+});
+
+
+
+ $("#btn").click(function(){ 
+RongIMClient.getInstance().getHistoryMessages(RongIMLib.ConversationType.PRIVATE, 'cheng', null, 1, {
+          onSuccess: function(list, hasMsg) {$("#demo").text("")
+if(hasMsg){
+			  for(var i=0;i<list.length;i++){
+			    $("#demo").append(list[i].content.content+"<br/>") ; 
+			  }
+} 
+            // hasMsg为boolean值，如果为true则表示还有剩余历史消息可拉取，为false的话表示没有剩余历史消息可供拉取。
+               // list 为拉取到的历史消息列表
+          },
+          onError: function(error) {
+              // APP未开启消息漫游或处理异常
+                   // throw new ERROR ......
+          }
+        });
+
+ 
+ 
+   }); 
+})
+
+</script>
+</head>
+
+<body> 
+<input id="btn" value="监听" type="button"></input><input id="btn1" value="cheng未读" type="button"></input></input><input id="btn2" value="最后一次回话列表" type="button"></input>
+<p/>
+
+<div id="demo"></div>
+ 
+
+</body>
+</html>
